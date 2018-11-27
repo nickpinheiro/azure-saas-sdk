@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Logic.Orchestration.Api", "Saas.Logic.Orchestration.Api\Saas.Logic.Orchestration.Api.csproj", "{0066E9AD-DE24-4BE0-AFC8-027EDF51CBB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Logic.Orchestration.Api.Tests", "Saas.Logic.Orchestration.Api.Tests\Saas.Logic.Orchestration.Api.Tests.csproj", "{35C85FCB-4567-43EE-9335-C8AA780ADC09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Logic.Notification.Functions", "Saas.Logic.Notification.Functions\Saas.Logic.Notification.Functions.csproj", "{5B02A34D-D519-4140-A8ED-8A4DA4762D77}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Logic.Orchestration.Api.Arm", "Saas.Logic.Orchestration.Api.Arm\Saas.Logic.Orchestration.Api.Arm.deployproj", "{CC316035-C85D-4507-BCD3-D76476B33110}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Logic.Notification.Functions.Arm", "Saas.Logic.Notification.Functions.Arm\Saas.Logic.Notification.Functions.Arm.deployproj", "{1ED6EACC-2726-4B1D-8A15-B583E060E605}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0066E9AD-DE24-4BE0-AFC8-027EDF51CBB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0066E9AD-DE24-4BE0-AFC8-027EDF51CBB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0066E9AD-DE24-4BE0-AFC8-027EDF51CBB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0066E9AD-DE24-4BE0-AFC8-027EDF51CBB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C85FCB-4567-43EE-9335-C8AA780ADC09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C85FCB-4567-43EE-9335-C8AA780ADC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C85FCB-4567-43EE-9335-C8AA780ADC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C85FCB-4567-43EE-9335-C8AA780ADC09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B02A34D-D519-4140-A8ED-8A4DA4762D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B02A34D-D519-4140-A8ED-8A4DA4762D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B02A34D-D519-4140-A8ED-8A4DA4762D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B02A34D-D519-4140-A8ED-8A4DA4762D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC316035-C85D-4507-BCD3-D76476B33110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC316035-C85D-4507-BCD3-D76476B33110}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC316035-C85D-4507-BCD3-D76476B33110}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC316035-C85D-4507-BCD3-D76476B33110}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ED6EACC-2726-4B1D-8A15-B583E060E605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ED6EACC-2726-4B1D-8A15-B583E060E605}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ED6EACC-2726-4B1D-8A15-B583E060E605}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED6EACC-2726-4B1D-8A15-B583E060E605}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8531ADFC-3032-4412-92D1-4F5F68E15F44}
+	EndGlobalSection
+EndGlobal
