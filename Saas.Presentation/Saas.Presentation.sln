@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Presentation.Provider.Web", "Saas.Presentation.Provider.Web\Saas.Presentation.Provider.Web.csproj", "{A2C774FE-68A8-4795-BD5E-E95755EA9FCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Presentation.Provider.Web.Tests", "Saas.Presentation.Provider.Web.Tests\Saas.Presentation.Provider.Web.Tests.csproj", "{737FE3FD-9295-444C-B610-DD97C94B1C26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Presentation.Tenant.Web", "Saas.Presentation.Tenant.Web\Saas.Presentation.Tenant.Web.csproj", "{E8A0C793-8AB9-41E3-A437-3B0E15B26E20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saas.Presentation.Tenant.Web.Tests", "Saas.Presentation.Tenant.Web.Tests\Saas.Presentation.Tenant.Web.Tests.csproj", "{358A6B38-16DB-4055-88CA-EB3DF5EF5AFC}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Presentation.Provider.Web.Arm", "Saas.Presentation.Provider.Web.Arm\Saas.Presentation.Provider.Web.Arm.deployproj", "{8EE9A979-F144-4E99-94F1-26D8E0F68464}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Presentation.Tenant.Web.Arm", "Saas.Presentation.Tenant.Web.Arm\Saas.Presentation.Tenant.Web.Arm.deployproj", "{F7E85658-69A6-41F2-AED1-54DA94E1B339}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Presentation.Tenant.Web.Arm.AppSettings", "Saas.Presentation.Tenant.Web.Arm.AppSettings\Saas.Presentation.Tenant.Web.Arm.AppSettings.deployproj", "{4B025240-3F8D-45E9-85CA-19703954A35A}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Presentation.Tenant.Web.Arm.ConnStrings", "Saas.Presentation.Tenant.Web.Arm.ConnStrings\Saas.Presentation.Tenant.Web.Arm.ConnStrings.deployproj", "{8817542D-0F2C-44EE-8242-236E3EE0EA87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Saas.Presentation.PowerBi", "Saas.Presentation.PowerBi", "{2921B53E-C6EE-41CD-80B6-90DE101E691C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2C774FE-68A8-4795-BD5E-E95755EA9FCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2C774FE-68A8-4795-BD5E-E95755EA9FCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2C774FE-68A8-4795-BD5E-E95755EA9FCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2C774FE-68A8-4795-BD5E-E95755EA9FCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{737FE3FD-9295-444C-B610-DD97C94B1C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{737FE3FD-9295-444C-B610-DD97C94B1C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{737FE3FD-9295-444C-B610-DD97C94B1C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{737FE3FD-9295-444C-B610-DD97C94B1C26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8A0C793-8AB9-41E3-A437-3B0E15B26E20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A0C793-8AB9-41E3-A437-3B0E15B26E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A0C793-8AB9-41E3-A437-3B0E15B26E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A0C793-8AB9-41E3-A437-3B0E15B26E20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{358A6B38-16DB-4055-88CA-EB3DF5EF5AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{358A6B38-16DB-4055-88CA-EB3DF5EF5AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{358A6B38-16DB-4055-88CA-EB3DF5EF5AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{358A6B38-16DB-4055-88CA-EB3DF5EF5AFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EE9A979-F144-4E99-94F1-26D8E0F68464}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EE9A979-F144-4E99-94F1-26D8E0F68464}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EE9A979-F144-4E99-94F1-26D8E0F68464}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EE9A979-F144-4E99-94F1-26D8E0F68464}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7E85658-69A6-41F2-AED1-54DA94E1B339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E85658-69A6-41F2-AED1-54DA94E1B339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E85658-69A6-41F2-AED1-54DA94E1B339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E85658-69A6-41F2-AED1-54DA94E1B339}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B025240-3F8D-45E9-85CA-19703954A35A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B025240-3F8D-45E9-85CA-19703954A35A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B025240-3F8D-45E9-85CA-19703954A35A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B025240-3F8D-45E9-85CA-19703954A35A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8817542D-0F2C-44EE-8242-236E3EE0EA87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8817542D-0F2C-44EE-8242-236E3EE0EA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8817542D-0F2C-44EE-8242-236E3EE0EA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8817542D-0F2C-44EE-8242-236E3EE0EA87}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C1D5DA36-DEB3-4793-89B0-337018985D8D}
+	EndGlobalSection
+EndGlobal
