@@ -1,1 +1,1 @@
-# Azure SaaS Software Development Kit (SDK)
+# Azure SaaS Development Kit
