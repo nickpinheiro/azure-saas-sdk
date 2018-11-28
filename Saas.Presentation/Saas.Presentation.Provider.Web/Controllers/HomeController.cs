@@ -26,5 +26,21 @@ namespace Saas.Presentation.Provider.Web.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public ActionResult Tenant()
+        {
+            ViewBag.Message = "Your tenant page.";
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Tenant(Saas.Presentation.Provider.Web.Models.Tenant tenant)
+        {
+            ViewBag.Message = "Your tenant page.";
+
+            return Redirect("/");
+        }
     }
 }
