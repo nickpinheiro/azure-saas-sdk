@@ -1,8 +1,63 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
-  "variables": {},
-  "resources": [],
-  "outputs": {}
+  "parameters": {
+    "contoso-foundation-sqlserverAdminLogin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contoso-foundation-sqlserverAdminLoginPassword": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "contoso-foundation-sqlserverName": "contososaas"
+  },
+  "resources": [
+    {
+      "name": "[variables('contoso-foundation-sqlserverName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('contoso-foundation-sqlserverAdminLogin')]",
+        "administratorLoginPassword": "[parameters('contoso-foundation-sqlserverAdminLoginPassword')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+          ],
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "AllowLocalIps",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+          ],
+          "properties": {
+            "endIpAddress": "98.110.191.255",
+            "startIpAddress": "98.110.191.0"
+          }
+        }
+      ],
+      "tags": {
+        "displayName": "contoso-foundation-sqlserver"
+      }
+
+    }
+  ],
+  "outputs": {
+  }
 }
