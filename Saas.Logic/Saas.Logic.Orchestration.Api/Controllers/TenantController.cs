@@ -28,6 +28,7 @@ namespace Saas.Logic.Orchestration.Api.Controllers
         public void Post([FromBody]Models.Tenant tenant)
         {
             HostingEnvironment.QueueBackgroundWorkItem(ct => Tenant.CreateTenantAsync(tenant));
+            //Tenant.CreateTenantAsync(tenant);
         }
 
         // PUT api/<controller>/5
