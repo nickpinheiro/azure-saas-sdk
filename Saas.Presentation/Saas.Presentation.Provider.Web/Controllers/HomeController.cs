@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Rest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -28,19 +29,35 @@ namespace Saas.Presentation.Provider.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Tenant()
+        public ActionResult Tenant(int id, string planName)
         {
             ViewBag.Message = "Your tenant page.";
+            ViewBag.Name = planName;
 
             return View();
         }
 
         [HttpPost]
-        public ActionResult Tenant(Saas.Presentation.Provider.Web.Models.Tenant tenant)
+        public ActionResult Tenant(Models.Tenant tenant)
         {
-            ViewBag.Message = "Your tenant page.";
+            tenant.ProductId = 3;
 
-            return Redirect("/");
+            ContosoDevApiOrchestration client = new ContosoDevApiOrchestration(new Uri("https://contoso-dev-api-orchestration.azurewebsites.net"), new AnonymousCredential());
+            client.Accepted(tenant);
+
+            return View("Confirmation");
+        }
+
+        public ActionResult Confirmation()
+        {
+            ViewBag.Message = "Your confirmation page.";
+
+            return View();
+        }
+
+        private class AnonymousCredential : ServiceClientCredentials
+        {
+
         }
     }
 }

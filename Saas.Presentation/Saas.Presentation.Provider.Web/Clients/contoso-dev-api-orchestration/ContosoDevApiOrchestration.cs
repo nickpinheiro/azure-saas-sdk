@@ -276,6 +276,10 @@ namespace Saas.Presentation.Provider.Web
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "tenant");
             }
+            if (tenant != null)
+            {
+                tenant.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;

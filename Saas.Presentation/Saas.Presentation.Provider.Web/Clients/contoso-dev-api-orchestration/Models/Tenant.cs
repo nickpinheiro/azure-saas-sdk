@@ -10,6 +10,7 @@ namespace Saas.Presentation.Provider.Web.Models
     using Newtonsoft.Json;
     using Microsoft.Rest;
     using Microsoft.Rest.Serialization;
+    using System.ComponentModel.DataAnnotations;
 
     public partial class Tenant
     {
@@ -21,33 +22,33 @@ namespace Saas.Presentation.Provider.Web.Models
         /// <summary>
         /// Initializes a new instance of the Tenant class.
         /// </summary>
-        public Tenant(string name = default(string), string type = default(string), string category = default(string), string region = default(string))
+        public Tenant(string name, int? productId = default(int?))
         {
             Name = name;
-            Type = type;
-            Category = category;
-            Region = region;
+            ProductId = productId;
         }
 
         /// <summary>
         /// </summary>
+        [Display(Name = "Company Name")]
+        [Required]
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        [JsonProperty(PropertyName = "productId")]
+        public int? ProductId { get; set; }
 
         /// <summary>
+        /// Validate the object. Throws ValidationException if validation fails.
         /// </summary>
-        [JsonProperty(PropertyName = "category")]
-        public string Category { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "region")]
-        public string Region { get; set; }
-
+        public virtual void Validate()
+        {
+            if (Name == null)
+            {
+                throw new Microsoft.Rest.ValidationException(ValidationRules.CannotBeNull, "Name");
+            }
+        }
     }
 }

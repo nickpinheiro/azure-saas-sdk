@@ -11,7 +11,7 @@
     }
   },
   "variables": {
-    "contoso-foundation-sqlserverName": "contososaas"
+    "contoso-foundation-sqlserverName": "contosodevsaas"
   },
   "resources": [
     {
@@ -34,8 +34,8 @@
             "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
           ],
           "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
           }
         },
         {
@@ -47,8 +47,8 @@
             "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
           ],
           "properties": {
-            "endIpAddress": "98.110.191.255",
-            "startIpAddress": "98.110.191.0"
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "255.255.255.255"
           }
         }
       ],

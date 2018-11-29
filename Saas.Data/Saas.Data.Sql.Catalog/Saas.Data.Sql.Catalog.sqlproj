@@ -63,5 +63,6 @@
   <ItemGroup>
     <Build Include="Tables\Tenant.sql" />
     <Build Include="Stored Procedures\usp_AddTenant.sql" />
+    <Build Include="Tables\Product.sql" />
   </ItemGroup>
 </Project>
