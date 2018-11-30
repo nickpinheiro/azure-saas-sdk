@@ -23,12 +23,7 @@ namespace Saas.Logic.Orchestration.Api.Classes
         private static string appKey = ConfigurationManager.AppSettings["ida:AppKey"];
         private static string resource = "https://management.azure.com/";
         private static string azureManagementServiceBaseAddress = ConfigurationManager.AppSettings["azure:ManagementServiceBaseAddress"];
-
         private static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenantId);
-
-        //
-        // To contact the Azure Management Service we need it's base URL.
-        //
 
         private static HttpClient httpClient = new HttpClient();
         private static AuthenticationContext authContext = null;
@@ -37,18 +32,41 @@ namespace Saas.Logic.Orchestration.Api.Classes
         public static async Task CreateTenantAsync(Models.Tenant tenant)
         {
             string tenantNameFormatted = tenant.Name.Replace(" ", string.Empty).ToLower();
-            string resourceGroupName = tenantNameFormatted;
+            string foundationResourceGroupName = "contoso-dev-foundation";
+            string tenantResourceGroupName = "contoso-dev-tenants";
+            string tenantPrefixName = "contoso-dev-plan3-";
+            string appServiceName = tenantPrefixName + tenantNameFormatted + "-web";
+            string databaseName = tenantPrefixName + tenantNameFormatted +"-sql";
+
+            AppSettings appSettings = new AppSettings();
+            appSettings.BlobPath = "https://wingtipsaas.blob.core.windows.net/images-sa/";
+            appSettings.ConnectionTimeOut = "30";
+            appSettings.DatabasePassword = "pass@word1";
+            appSettings.DatabaseServerPort = "1433";
+            appSettings.DatabaseUser = "contosoadmin";
+            appSettings.ResetEventDates = "true";
+            appSettings.ServicePlan = "Standard";
+            appSettings.SqlProtocol = "tcp";
+            appSettings.TenantServer = "contosodevsaas";
+            appSettings.TenantDatabase = databaseName;
+            appSettings.LearnHowFooterUrl = "https://aka.ms/sqldbsaastutorial";
+            appSettings.ASPNETCORE_ENVIRONMENT = "Production";
+            appSettings.WEBSITE_NODE_DEFAULT_VERSION = "4.2.3";
+            appSettings.DefaultRequestCulture = "en-us";
+
+            AppConfig properties = new AppConfig();
+            properties.Properties = appSettings;
 
             //string databaseDeployment = "deploy-database-" + tenantNameFormatted;
 
-            await CreateDatabaseAsync(resourceGroupName, tenantNameFormatted);
+            await CreateDatabaseAsync(foundationResourceGroupName, tenantNameFormatted, databaseName);
+            await CreateAppServiceAsync(tenantResourceGroupName, appServiceName, tenantNameFormatted);
+            await UpdateAppSettingsAsync(tenantResourceGroupName, appServiceName, properties, tenantNameFormatted);
             //await CheckDeploymentStatusAsync("bd-prod-core", databaseDeployment);
             AddNewTenant(tenant.Name, tenant.ProductId);
-
-            //return null;
         }
 
-        private static async Task CreateDatabaseAsync(string resourceGroupName, string tenantName)
+        private static async Task CreateDatabaseAsync(string foundationResourceGroupName, string tenantName, string databaseName)
         {
             authContext = new AuthenticationContext(authority);
             clientCredential = new ClientCredential(clientId, appKey);
@@ -60,9 +78,9 @@ namespace Saas.Logic.Orchestration.Api.Classes
 
             // JSON encode To Do item and PUT to the Azure Management Service API.
 
-            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevstorageacct.blob.core.windows.net/templates/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"databaseName\": {\"value\": \"contoso-dev-plan3-" + tenantName + "-sql\"}}}}}", UnicodeEncoding.UTF8, "application/json");
+            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevstorageacct.blob.core.windows.net/templates/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"databaseName\": {\"value\": \"" + databaseName + "\"}}}}}", UnicodeEncoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/contoso-dev-foundation/providers/Microsoft.Resources/deployments/deploy-database-" + tenantName + "?api-version=2015-01-01", stringContent);
+            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/contoso-dev-foundation/providers/Microsoft.Resources/deployments/saas-deploy-database-" + tenantName + "?api-version=2015-01-01", stringContent);
             if (response.IsSuccessStatusCode == true)
             {
 
@@ -73,43 +91,113 @@ namespace Saas.Logic.Orchestration.Api.Classes
             }
         }
 
-        //private static async Task CheckDeploymentStatusAsync(string resourceGroupName, string deploymentName)
-        //{
-        //    string provisioningState = await GetDeploymentAsync(resourceGroupName, deploymentName);
+        private static async Task CreateAppServiceAsync(string tenantResourceGroupName, string appServiceName, string tenantName)
+        {
+            //
+            // Create a Web Application.
+            //
+            AuthenticationResult result = await GetAccessToken();
 
-        //    while (!IsDeploymentSucceeded(provisioningState))
-        //    {
-        //        await Task.Delay(30000);  // Delay for 30 seconds and check deployment status again
-        //        provisioningState = await GetDeploymentAsync(resourceGroupName, deploymentName);
-        //    }
-        //}
+            // Add the access token to the authorization header of the request.
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
-        //private static async Task<string> GetDeploymentAsync(string resourceGroupName, string deploymentName)
-        //{
-        //    // https://docs.microsoft.com/en-us/rest/api/resources/deployments/get#deploymentpropertiesextended
+            // JSON encode To Do item and PUT to the Azure Management Service API.
+            //Console.WriteLine("Creating App Service at {0}", timeNow);
 
-        //    //
-        //    // Get database deployment and check status.
-        //    //
-        //    AuthenticationResult result = await GetAccessToken();
+            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevstorageacct.blob.core.windows.net/templates/web/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"webAppName\": {\"value\": \"" + appServiceName + "\"}}}}", UnicodeEncoding.UTF8, "application/json");
 
-        //    // Add the access token to the authorization header of the request.
-        //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + tenantResourceGroupName + "/providers/Microsoft.Resources/deployments/saas-deploy-web-" + tenantName + "?api-version=2015-01-01", stringContent);
 
-        //    HttpResponseMessage response = await httpClient.GetAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + resourceGroupName + "/deployments/" + deploymentName + "?api-version=2018-02-01");
-        //    var json = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode == true)
+            {
 
-        //    if (response.IsSuccessStatusCode == true)
-        //    {
-        //        Deployment deployment = JsonConvert.DeserializeObject<Deployment>(json);
-        //        string provisioningState = deployment.properties.provisioningState;
-        //        return provisioningState;
-        //    }
-        //    else
-        //    {
-        //        return null;
-        //    }
-        //}
+            }
+            else
+            {
+
+            }
+        }
+
+        private static async Task UpdateAppSettingsAsync(string tenantResourceGroupName, string appServiceName, AppConfig properties, string tenantNameFormatted)
+        {
+            // Check deployment status of app service
+            await CheckDeploymentStatusAsync(tenantResourceGroupName, "deploy-web-" + tenantNameFormatted);
+
+            //
+            // Set Application Settings.
+            //
+            AuthenticationResult result = await GetAccessToken();
+
+            // Add the access token to the authorization header of the request.
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+
+            // JSON encode To Do item and PUT to the Azure Management Service API.
+            string json = JsonConvert.SerializeObject(properties);
+            StringContent stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
+
+            Uri uri = new Uri(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + tenantResourceGroupName + "/providers/Microsoft.Web/sites/" + appServiceName + "/config/appsettings?api-version=2016-08-01");
+
+            HttpResponseMessage response = await httpClient.PutAsync(uri, stringContent);
+
+            if (response.IsSuccessStatusCode == true)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        private static async Task CheckDeploymentStatusAsync(string resourceGroupName, string deploymentName)
+        {
+            string provisioningState = await GetDeploymentAsync(resourceGroupName, deploymentName);
+
+            while (!IsDeploymentSucceeded(provisioningState))
+            {
+                await Task.Delay(30000);  // Delay for 30 seconds and check deployment status again
+                provisioningState = await GetDeploymentAsync(resourceGroupName, deploymentName);
+            }
+        }
+
+        private static async Task<string> GetDeploymentAsync(string resourceGroupName, string deploymentName)
+        {
+            // https://docs.microsoft.com/en-us/rest/api/resources/deployments/get#deploymentpropertiesextended
+
+            //
+            // Get database deployment and check status.
+            //
+            AuthenticationResult result = await GetAccessToken();
+
+            // Add the access token to the authorization header of the request.
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+
+            HttpResponseMessage response = await httpClient.GetAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + resourceGroupName + "/deployments/" + deploymentName + "?api-version=2018-02-01");
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode == true)
+            {
+                Deployment deployment = JsonConvert.DeserializeObject<Deployment>(json);
+                string provisioningState = deployment.properties.provisioningState;
+                return provisioningState;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static bool IsDeploymentSucceeded(string provisioningState)
+        {
+            if (provisioningState == "Succeeded")
+            {
+                return true; // Deployment is complete
+            }
+            else
+            {
+                return false; // Deployment is running
+            }
+        }
 
         private static void AddNewTenant(string tenantName, int productId)
         {
