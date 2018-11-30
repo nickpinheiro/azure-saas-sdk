@@ -3,7 +3,8 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "contoso-foundation-sqlserverName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue":  "contosodevsaas1"
     },
     "contoso-foundation-sqlserverAdminLogin": {
       "type": "string",
