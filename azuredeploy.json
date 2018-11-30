@@ -2,31 +2,31 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "contoso-foundation-sqlserverName": {
+    "sqlserverName": {
       "type": "string",
       "defaultValue":  "contosodevsaas1"
     },
-    "contoso-foundation-sqlserverAdminLogin": {
+    "sqlserverAdminLogin": {
       "type": "string",
       "minLength": 1
     },
-    "contoso-foundation-sqlserverAdminLoginPassword": {
+    "sqlserverAdminLoginPassword": {
       "type": "securestring"
     }
   },
   "variables": {
-    "contoso-foundation-sqlserverName": "[parameters('contoso-foundation-sqlserverName')]"
+    "sqlserverName": "[parameters('sqlserverName')]"
   },
   "resources": [
     {
-      "name": "[variables('contoso-foundation-sqlserverName')]",
+      "name": "[variables('sqlserverName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "dependsOn": [],
       "apiVersion": "2014-04-01-preview",
       "properties": {
-        "administratorLogin": "[parameters('contoso-foundation-sqlserverAdminLogin')]",
-        "administratorLoginPassword": "[parameters('contoso-foundation-sqlserverAdminLoginPassword')]"
+        "administratorLogin": "[parameters('sqlserverAdminLogin')]",
+        "administratorLoginPassword": "[parameters('sqlserverAdminLoginPassword')]"
       },
       "resources": [
         {
@@ -35,7 +35,7 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
@@ -48,7 +48,7 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
