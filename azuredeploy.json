@@ -2,15 +2,15 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "sqlserverName": {
+    "SqlServerName": {
       "type": "string",
       "defaultValue":  "contosodevsaas1"
     },
-    "sqlserverAdminLogin": {
+    "SqlServerAdminLogin": {
       "type": "string",
       "minLength": 1
     },
-    "sqlserverAdminLoginPassword": {
+    "SqlServerAdminLoginPassword": {
       "type": "securestring"
     }
   },
@@ -25,8 +25,8 @@
       "dependsOn": [],
       "apiVersion": "2014-04-01-preview",
       "properties": {
-        "administratorLogin": "[parameters('sqlserverAdminLogin')]",
-        "administratorLoginPassword": "[parameters('sqlserverAdminLoginPassword')]"
+        "administratorLogin": "[parameters('SqlServerAdminLogin')]",
+        "administratorLoginPassword": "[parameters('SqlServerAdminLoginPassword')]"
       },
       "resources": [
         {
@@ -57,7 +57,7 @@
         }
       ],
       "tags": {
-        "displayName": "contoso-foundation-sqlserver"
+        "displayName": "foundation-sqlserver"
       }
 
     }
