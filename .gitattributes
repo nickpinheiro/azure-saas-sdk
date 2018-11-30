@@ -63,3 +63,4 @@
 #*.RTF   diff=astextplain
 
 Saas.Presentation/Saas.Presentation.Provider.Web/Scripts/* linguist-vendored
+Saas.Presentation/Saas.Presentation.Tenant.Web/Scripts/* linguist-vendored
