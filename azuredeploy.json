@@ -3,8 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "contoso-foundation-sqlserverName": {
-      "type": "string",
-      "minLength": 1
+      "type": "string"
     },
     "contoso-foundation-sqlserverAdminLogin": {
       "type": "string",
@@ -15,7 +14,7 @@
     }
   },
   "variables": {
-    "contoso-foundation-sqlserverName": "parameters('contoso-foundation-sqlserverName')"
+    "contoso-foundation-sqlserverName": "[parameters('contoso-foundation-sqlserverName')]"
   },
   "resources": [
     {
