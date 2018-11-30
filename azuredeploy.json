@@ -19,7 +19,7 @@
   },
   "resources": [
     {
-      "name": "[variables('sqlserverName')]",
+      "name": "[variables('SqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "dependsOn": [],
