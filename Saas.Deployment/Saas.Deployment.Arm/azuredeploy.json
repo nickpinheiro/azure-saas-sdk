@@ -11,7 +11,10 @@
   },
   "variables": {
     "sqlserverName": "[concat(parameters('SaasProvider'), parameters('Environment'), 'saas')]",
-    "sqlServerDatabaseName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-catalog')]"
+    "sqlServerDatabaseName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-catalog-sql')]",
+    "appServicePlanName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-appsp')]",
+    "providerWebAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-web')]",
+    "providerOrchestrationApiAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-api')]"
   },
   "resources": [
     {
@@ -86,6 +89,91 @@
                 "administratorLogin": "saasadmin",
                 "administratorLoginPassword": "pass@word1",
                 "operationMode": "Import"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "[variables('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "F1"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "SaaS Provider App Service Plan"
+      },
+      "properties": {
+        "name": "[variables('appServicePlanName')]",
+        "numberOfWorkers": 1
+      },
+      "resources": [
+        {
+          "name": "[variables('providerWebAppName')]",
+          "type": "Microsoft.Web/sites",
+          "location": "eastus",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]"
+          ],
+          "tags": {
+            "displayName": "SaaS Provider Web App"
+          },
+          "properties": {
+            "name": "[variables('providerWebAppName')]",
+            "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', variables('appServicePlanName'))]"
+          },
+          "resources": [
+            {
+              "name": "MSDeploy",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [ "[resourceId('Microsoft.Web/sites', variables('providerWebAppName'))]" ],
+              "tags": { "displayName": "Deploy" },
+              "properties": {
+                "packageUri": "https://contosodevstorageacct.blob.core.windows.net/packages/Saas.Presentation.Provider.Web.zip",
+                "dbType": "",
+                "connectionString": ""
+              }
+            }
+          ]
+        },
+        {
+          "name": "[variables('providerOrchestrationApiAppName')]",
+          "type": "Microsoft.Web/sites",
+          "kind": "api",
+          "location": "eastus",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]"
+          ],
+          "tags": {
+            "displayName": "SaaS Provider Orchestration API App"
+          },
+          "properties": {
+            "name": "[variables('providerOrchestrationApiAppName')]",
+            "siteConfig": {
+              "appSettings": []
+            },
+            "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', variables('appServicePlanName'))]"
+          },
+          "resources": [
+            {
+              "name": "MSDeploy",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [ "[resourceId('Microsoft.Web/sites', variables('providerOrchestrationApiAppName'))]" ],
+              "tags": { "displayName": "Deploy" },
+              "properties": {
+                "packageUri": "https://contosodevstorageacct.blob.core.windows.net/packages/Saas.Logic.Orchestration.Api.zip",
+                "dbType": "",
+                "connectionString": ""
               }
             }
           ]
