@@ -1,6 +1,7 @@
 ﻿using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -42,7 +43,7 @@ namespace Saas.Presentation.Provider.Web.Controllers
         {
             tenant.ProductId = 3;
 
-            ContosoDevApiOrchestration client = new ContosoDevApiOrchestration(new Uri("https://contoso-dev-api-orchestration.azurewebsites.net"), new AnonymousCredential());
+            ContosoDevApiOrchestration client = new ContosoDevApiOrchestration(new Uri(ConfigurationManager.AppSettings["SaaSOrchestrationApiBaseUri"]), new AnonymousCredential());
             client.Accepted(tenant);
 
             return View("Confirmation");
