@@ -2,30 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "contoso-foundation-sqlserverName": {
+    "SaasProvider": {
       "type": "string"
     },
-    "contoso-foundation-sqlserverAdminLogin": {
-      "type": "string",
-      "minLength": 1
-    },
-    "contoso-foundation-sqlserverAdminLoginPassword": {
-      "type": "securestring"
+    "Environment": {
+      "type": "string"
     }
   },
   "variables": {
-    "contoso-foundation-sqlserverName": "parameters('contoso-foundation-sqlserverName')"
+    "sqlserverName": "[concat(parameters('SaasProvider'), parameters('Environment'), 'saas')]"
   },
   "resources": [
     {
-      "name": "[variables('contoso-foundation-sqlserverName')]",
+      "name": "[variables('SqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "dependsOn": [],
       "apiVersion": "2014-04-01-preview",
       "properties": {
-        "administratorLogin": "[parameters('contoso-foundation-sqlserverAdminLogin')]",
-        "administratorLoginPassword": "[parameters('contoso-foundation-sqlserverAdminLoginPassword')]"
+        "administratorLogin": "saasadmin",
+        "administratorLoginPassword": "pass@word1"
       },
       "resources": [
         {
@@ -34,7 +30,7 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
@@ -47,18 +43,14 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', variables('contoso-foundation-sqlserverName'))]"
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
             "endIpAddress": "255.255.255.255"
           }
         }
-      ],
-      "tags": {
-        "displayName": "contoso-foundation-sqlserver"
-      }
-
+      ]
     }
   ],
   "outputs": {

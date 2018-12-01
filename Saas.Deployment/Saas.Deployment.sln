@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Saas.Deployment.Arm", "Saas.Deployment.Arm\Saas.Deployment.Arm.deployproj", "{D7FE1E37-01AD-4C08-B140-3F50E67448BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7FE1E37-01AD-4C08-B140-3F50E67448BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7FE1E37-01AD-4C08-B140-3F50E67448BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7FE1E37-01AD-4C08-B140-3F50E67448BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7FE1E37-01AD-4C08-B140-3F50E67448BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22DD705E-5FFD-4BA2-8EA1-229652DFCB46}
+	EndGlobalSection
+EndGlobal
