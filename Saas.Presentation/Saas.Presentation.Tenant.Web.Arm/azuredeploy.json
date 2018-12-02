@@ -2,35 +2,28 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "serverFarmName": {
-      "type": "string",
-      "defaultValue": "contoso-dev-appsp"
+    "TenantWebAppName": {
+      "type": "string"
     },
-    "serverFarmResourceGroup": {
-      "type": "string",
-      "defaultValue": "contoso-dev-foundation"
-    },
-    "webAppName": {
+    "AppServicePlanName": {
       "type": "string"
     }
   },
   "variables": {
-    "name": "[parameters('webAppName')]"
   },
   "resources": [
     {
-      "name": "[variables('name')]",
+      "name": "[parameters('tenantWebAppName')]",
       "type": "Microsoft.Web/sites",
       "location": "eastus",
       "apiVersion": "2015-08-01",
       "dependsOn": [],
       "tags": {
-        "[concat('hidden-related:', resourceId(parameters('serverFarmResourceGroup'), 'Microsoft.Web/serverFarms', parameters('serverFarmName')))]": "Resource",
-        "displayName": "ma-subs"
+        "displayName": "SaaS Tenant Web App"
       },
       "properties": {
-        "name": "[variables('name')]",
-        "serverFarmId": "[resourceId(parameters('serverFarmResourceGroup'), 'Microsoft.Web/serverFarms', parameters('serverFarmName'))]"
+        "name": "[parameters('tenantWebAppName')]",
+        "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', parameters('appServicePlanName'))]"
       },
       "resources": [
         {
@@ -38,15 +31,12 @@
           "type": "extensions",
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-08-01",
-          "dependsOn": [ "[resourceId('Microsoft.Web/sites', variables('name'))]" ],
-          "tags": { "displayName": "deploy" },
+          "dependsOn": [ "[resourceId('Microsoft.Web/sites', parameters('tenantWebAppName'))]" ],
+          "tags": { "displayName": "Deploy" },
           "properties": {
-            "packageUri": "https://contosodevstorageacct.blob.core.windows.net/packages/eventsAppPackage.zip",
+            "packageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/packages/eventsAppPackage.zip",
             "dbType": "",
             "connectionString": ""
-            //"setParameters": {
-            //  "IIS Web Application Name": "[variables('name')]"
-            //}
           }
         }
       ]

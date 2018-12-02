@@ -17,7 +17,8 @@
     "sqlServeradministratorLoginPassword": "pass@word1",
     "appServicePlanName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-appsp')]",
     "providerWebAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-web')]",
-    "providerOrchestrationApiAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-api')]"
+    "providerOrchestrationApiAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-api')]",
+    "tenantResourceGroupName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-tenants')]"
   },
   "resources": [
     {
@@ -88,7 +89,7 @@
               "properties": {
                 "storageKeyType": "StorageAccessKey",
                 "storageKey": "o3hcmckNlLx+p4psxXKTjx8h/p+zIKADRQt+qyAoWYbz/Mop6N/E5VonqtVJHJNDLPMgFbEJckQ6q6ZrSFukdg==",
-                "storageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/packages/bacpacs/saas-catalog-sql.bacpac",
+                "storageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/bacpacs/saas-catalog-sql.bacpac",
                 "administratorLogin": "[variables('sqlServerAdministratorLogin')]",
                 "administratorLoginPassword": "[variables('sqlServeradministratorLoginPassword')]",
                 "operationMode": "Import"
@@ -178,7 +179,7 @@
               "connectionStrings": [
                 {
                   "name": "DefaultConnection",
-                  "connectionString": "[concat('Data Source=tcp:',variables('sqlserverName'),'.database.windows.net;Initial Catalog=',variables('sqlServerDatabaseName'),';User Id=',variables('sqlServerAdministratorLogin'),';Password=',variables('sqlServeradministratorLoginPassword'),' \"providerName=\"System.Data.SqlClient\"')]",
+                  "connectionString": "[concat('Data Source=tcp:',variables('sqlserverName'),'.database.windows.net;Initial Catalog=',variables('sqlServerDatabaseName'),';User Id=',variables('sqlServerAdministratorLogin'),';Password=',variables('sqlServeradministratorLoginPassword'),';\"', 'providerName=\"System.Data.SqlClient\"')]",
                   "type": "SQLAzure"
                 }
               ]
@@ -186,6 +187,25 @@
             "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', variables('appServicePlanName'))]"
           },
           "resources": [
+            {
+              "name": "appsettings",
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [
+                "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]",
+                "[concat('Microsoft.Web/sites/', variables('providerOrchestrationApiAppName'))]",
+                "[concat('Microsoft.Web/Sites/', variables('providerOrchestrationApiAppName'), '/Extensions/MSDeploy')]"
+              ],
+              "tags": {
+                "displayName": "App Settings"
+              },
+              "properties": {
+                "SaasFoundationResourceGroupName": "[resourceGroup().name]",
+                "SaasTenantResourceGroupName": "variables('tenantResourceGroupName')",
+                "SaasProviderName": "parameters('SaasProvider')",
+                "SaasEnvironmentName": "parameters('SaasEnvironments')"
+              }
+            },
             {
               "name": "MSDeploy",
               "type": "extensions",

@@ -32,10 +32,13 @@ namespace Saas.Logic.Orchestration.Api.Classes
         public static async Task CreateTenantAsync(Models.Tenant tenant)
         {
             string tenantNameFormatted = tenant.Name.Replace(" ", string.Empty).ToLower();
-            string foundationResourceGroupName = "contoso-dev-foundation";
-            string tenantResourceGroupName = "contoso-dev-tenants";
-            string tenantPrefixName = "contoso-dev-plan3-";
+            string environmentName = ConfigurationManager.AppSettings["SaasEnvironmentName"];
+            string foundationResourceGroupName = ConfigurationManager.AppSettings["SaasFoundationResourceGroupName"];
+            string tenantResourceGroupName = ConfigurationManager.AppSettings["SaasTenantResourceGroupName"];
+            string tenantPrefixName = ConfigurationManager.AppSettings["SaasProviderName"] + "-" + environmentName + "-plan3-";
+            string appServicePlanName = ConfigurationManager.AppSettings["SaasProviderName"] + "-" + environmentName + "-tenantsp";
             string appServiceName = tenantPrefixName + tenantNameFormatted + "-web";
+            string databaseServer = ConfigurationManager.AppSettings["SaasProviderName"] + environmentName+ "saas";
             string databaseName = tenantPrefixName + tenantNameFormatted +"-sql";
 
             AppSettings appSettings = new AppSettings();
@@ -43,11 +46,11 @@ namespace Saas.Logic.Orchestration.Api.Classes
             appSettings.ConnectionTimeOut = "30";
             appSettings.DatabasePassword = "pass@word1";
             appSettings.DatabaseServerPort = "1433";
-            appSettings.DatabaseUser = "contosoadmin";
+            appSettings.DatabaseUser = "saasadmin";
             appSettings.ResetEventDates = "true";
             appSettings.ServicePlan = "Standard";
             appSettings.SqlProtocol = "tcp";
-            appSettings.TenantServer = "contosodevsaas";
+            appSettings.TenantServer = databaseServer;
             appSettings.TenantDatabase = databaseName;
             appSettings.LearnHowFooterUrl = "https://aka.ms/sqldbsaastutorial";
             appSettings.ASPNETCORE_ENVIRONMENT = "Production";
@@ -59,14 +62,14 @@ namespace Saas.Logic.Orchestration.Api.Classes
 
             //string databaseDeployment = "deploy-database-" + tenantNameFormatted;
 
-            await CreateDatabaseAsync(foundationResourceGroupName, tenantNameFormatted, databaseName);
-            await CreateAppServiceAsync(tenantResourceGroupName, appServiceName, tenantNameFormatted);
+            await CreateDatabaseAsync(foundationResourceGroupName, tenantNameFormatted, databaseServer, databaseName);
+            await CreateAppServiceAsync(tenantResourceGroupName, appServiceName, appServicePlanName, tenantNameFormatted);
             await UpdateAppSettingsAsync(tenantResourceGroupName, appServiceName, properties, tenantNameFormatted);
             //await CheckDeploymentStatusAsync("bd-prod-core", databaseDeployment);
             AddNewTenant(tenant.Name, tenant.ProductId);
         }
 
-        private static async Task CreateDatabaseAsync(string foundationResourceGroupName, string tenantName, string databaseName)
+        private static async Task CreateDatabaseAsync(string foundationResourceGroupName, string tenantName, string databaseServer, string databaseName)
         {
             authContext = new AuthenticationContext(authority);
             clientCredential = new ClientCredential(clientId, appKey);
@@ -78,7 +81,7 @@ namespace Saas.Logic.Orchestration.Api.Classes
 
             // JSON encode To Do item and PUT to the Azure Management Service API.
 
-            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevstorageacct.blob.core.windows.net/templates/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"databaseName\": {\"value\": \"" + databaseName + "\"}}}}}", UnicodeEncoding.UTF8, "application/json");
+            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevartifacts.blob.core.windows.net/artifacts/templates/database/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"databaseName\": {\"value\": \"" + databaseName + "\"}, \"databaseServer\": {\"value\": \"" + databaseServer + "\"}}}}}", UnicodeEncoding.UTF8, "application/json");
 
             HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/contoso-dev-foundation/providers/Microsoft.Resources/deployments/saas-deploy-database-" + tenantName + "?api-version=2015-01-01", stringContent);
             if (response.IsSuccessStatusCode == true)
@@ -91,7 +94,7 @@ namespace Saas.Logic.Orchestration.Api.Classes
             }
         }
 
-        private static async Task CreateAppServiceAsync(string tenantResourceGroupName, string appServiceName, string tenantName)
+        private static async Task CreateAppServiceAsync(string tenantResourceGroupName, string appServiceName, string appServicePlanName, string tenantName)
         {
             //
             // Create a Web Application.
@@ -104,7 +107,7 @@ namespace Saas.Logic.Orchestration.Api.Classes
             // JSON encode To Do item and PUT to the Azure Management Service API.
             //Console.WriteLine("Creating App Service at {0}", timeNow);
 
-            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevstorageacct.blob.core.windows.net/templates/web/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"webAppName\": {\"value\": \"" + appServiceName + "\"}}}}", UnicodeEncoding.UTF8, "application/json");
+            StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevartifacts.blob.core.windows.net/artifacts/templates/web/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"TenantWebAppName\": {\"value\": \"" + appServiceName + "\"}, \"AppServicePlanName\": {\"value\": \"" + appServicePlanName + "\"}}}}}", UnicodeEncoding.UTF8, "application/json");
 
             HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + tenantResourceGroupName + "/providers/Microsoft.Resources/deployments/saas-deploy-web-" + tenantName + "?api-version=2015-01-01", stringContent);
 
@@ -121,7 +124,7 @@ namespace Saas.Logic.Orchestration.Api.Classes
         private static async Task UpdateAppSettingsAsync(string tenantResourceGroupName, string appServiceName, AppConfig properties, string tenantNameFormatted)
         {
             // Check deployment status of app service
-            await CheckDeploymentStatusAsync(tenantResourceGroupName, "deploy-web-" + tenantNameFormatted);
+            await CheckDeploymentStatusAsync(tenantResourceGroupName, "saas-deploy-web-" + tenantNameFormatted);
 
             //
             // Set Application Settings.
