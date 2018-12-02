@@ -179,7 +179,7 @@
               "connectionStrings": [
                 {
                   "name": "DefaultConnection",
-                  "connectionString": "[concat('Data Source=tcp:',variables('sqlserverName'),'.database.windows.net;Initial Catalog=',variables('sqlServerDatabaseName'),';User Id=',variables('sqlServerAdministratorLogin'),';Password=',variables('sqlServeradministratorLoginPassword'),';\"', 'providerName=\"System.Data.SqlClient\"')]",
+                  "connectionString": "[concat('Data Source=tcp:',variables('sqlserverName'),'.database.windows.net;Initial Catalog=',variables('sqlServerDatabaseName'),';User Id=',variables('sqlServerAdministratorLogin'),';Password=',variables('sqlServeradministratorLoginPassword'),';\" ', 'providerName=\"System.Data.SqlClient\"')]",
                   "type": "SQLAzure"
                 }
               ]
@@ -201,9 +201,9 @@
               },
               "properties": {
                 "SaasFoundationResourceGroupName": "[resourceGroup().name]",
-                "SaasTenantResourceGroupName": "variables('tenantResourceGroupName')",
-                "SaasProviderName": "parameters('SaasProvider')",
-                "SaasEnvironmentName": "parameters('SaasEnvironments')"
+                "SaasTenantResourceGroupName": "[variables('tenantResourceGroupName')]",
+                "SaasProviderName": "[parameters('SaasProvider')]",
+                "SaasEnvironmentName": "[parameters('Environment')]"
               }
             },
             {
