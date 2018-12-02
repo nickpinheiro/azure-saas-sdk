@@ -60,20 +60,22 @@ namespace Saas.Logic.Orchestration.Api.Classes
             AppConfig properties = new AppConfig();
             properties.Properties = appSettings;
 
-            //string databaseDeployment = "deploy-database-" + tenantNameFormatted;
+            authContext = new AuthenticationContext(authority);
+            clientCredential = new ClientCredential(clientId, appKey);
 
             await CreateDatabaseAsync(foundationResourceGroupName, tenantNameFormatted, databaseServer, databaseName);
+            await CreateResourceGroupAsync(tenantResourceGroupName);
+            await CreateAppServicePlanAsync(tenantResourceGroupName, appServicePlanName);
             await CreateAppServiceAsync(tenantResourceGroupName, appServiceName, appServicePlanName, tenantNameFormatted);
             await UpdateAppSettingsAsync(tenantResourceGroupName, appServiceName, properties, tenantNameFormatted);
-            //await CheckDeploymentStatusAsync("bd-prod-core", databaseDeployment);
             AddNewTenant(tenant.Name, tenant.ProductId);
         }
 
         private static async Task CreateDatabaseAsync(string foundationResourceGroupName, string tenantName, string databaseServer, string databaseName)
         {
-            authContext = new AuthenticationContext(authority);
-            clientCredential = new ClientCredential(clientId, appKey);
-
+            //
+            // Create a Database.
+            //
             AuthenticationResult result = await GetAccessToken();
 
             // Add the access token to the authorization header of the request.
@@ -83,7 +85,57 @@ namespace Saas.Logic.Orchestration.Api.Classes
 
             StringContent stringContent = new StringContent("{properties: {\"templateLink\": {\"uri\": \"https://contosodevartifacts.blob.core.windows.net/artifacts/templates/database/azuredeploy.json\",\"contentVersion\": \"1.0.0.0\"},\"mode\": \"Incremental\",\"parameters\": {\"databaseName\": {\"value\": \"" + databaseName + "\"}, \"databaseServer\": {\"value\": \"" + databaseServer + "\"}}}}}", UnicodeEncoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/contoso-dev-foundation/providers/Microsoft.Resources/deployments/saas-deploy-database-" + tenantName + "?api-version=2015-01-01", stringContent);
+            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/"+ foundationResourceGroupName +"/providers/Microsoft.Resources/deployments/saas-deploy-database-" + tenantName + "?api-version=2015-01-01", stringContent);
+            if (response.IsSuccessStatusCode == true)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        private static async Task CreateResourceGroupAsync(string tenantResourceGroupName)
+        {
+            //
+            // Create a Resource Group if it doesn't already exist.
+            //
+            AuthenticationResult result = await GetAccessToken();
+
+            // Add the access token to the authorization header of the request.
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+
+            // JSON encode To Do item and PUT to the Azure Management Service API.
+            StringContent stringContent = new StringContent("{location: \"eastus\"}", UnicodeEncoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + tenantResourceGroupName + "?api-version=2015-01-01", stringContent);
+
+            if (response.IsSuccessStatusCode == true)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        private static async Task CreateAppServicePlanAsync(string tenantResourceGroupName, string appServicePlanName)
+        {
+            //
+            // Create a Resource Group if it doesn't already exist.
+            //
+            AuthenticationResult result = await GetAccessToken();
+
+            // Add the access token to the authorization header of the request.
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+
+            // JSON encode To Do item and PUT to the Azure Management Service API.
+            StringContent stringContent = new StringContent("{location: \"eastus\"}", UnicodeEncoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PutAsync(azureManagementServiceBaseAddress + "subscriptions/" + ConfigurationManager.AppSettings["ida:Subscription"] + "/resourcegroups/" + tenantResourceGroupName + "/providers/Microsoft.Web/serverfarms/"+ appServicePlanName +"?api-version=2016-09-01", stringContent);
+
             if (response.IsSuccessStatusCode == true)
             {
 
@@ -190,18 +242,6 @@ namespace Saas.Logic.Orchestration.Api.Classes
             }
         }
 
-        private static bool IsDeploymentSucceeded(string provisioningState)
-        {
-            if (provisioningState == "Succeeded")
-            {
-                return true; // Deployment is complete
-            }
-            else
-            {
-                return false; // Deployment is running
-            }
-        }
-
         private static void AddNewTenant(string tenantName, int productId)
         {
             // Add tenant
@@ -213,33 +253,26 @@ namespace Saas.Logic.Orchestration.Api.Classes
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@name", tenantName);
-                    cmd.Parameters.AddWithValue("@productid", productId);
-
-                    //SqlParameter returnValue = new SqlParameter();
-                    //returnValue.Direction = System.Data.ParameterDirection.ReturnValue;
-                    //cmd.Parameters.Add(returnValue);
+                    cmd.Parameters.AddWithValue("@productId", productId);
 
                     cmd.ExecuteNonQuery();
-
-                    //int customerId = (int)returnValue.Value;
-
-                    //return customerId;
                 }
-            }
 
+                connection.Close();
+            }
         }
 
-        //private static bool IsDeploymentSucceeded(string provisioningState)
-        //{
-        //    if (provisioningState == "Succeeded")
-        //    {
-        //        return true; // Deployment is complete
-        //    }
-        //    else
-        //    {
-        //        return false; // Deployment is running
-        //    }
-        //}
+        private static bool IsDeploymentSucceeded(string provisioningState)
+        {
+            if (provisioningState == "Succeeded")
+            {
+                return true; // Deployment is complete
+            }
+            else
+            {
+                return false; // Deployment is running
+            }
+        }
 
         private static async Task<AuthenticationResult> GetAccessToken()
         {
