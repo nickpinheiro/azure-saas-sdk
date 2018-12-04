@@ -1,0 +1,227 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "SaasProvider": {
+      "type": "string"
+    },
+    "Environment": {
+      "type": "string",
+      "defaultValue": "dev"
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat(parameters('SaasProvider'), parameters('Environment'), 'saas')]",
+    "sqlServerDatabaseName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-catalog-sql')]",
+    "sqlServerAdministratorLogin": "saasadmin",
+    "sqlServeradministratorLoginPassword": "pass@word1",
+    "appServicePlanName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-appsp')]",
+    "providerWebAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-web')]",
+    "providerOrchestrationApiAppName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-provider-api')]",
+    "tenantResourceGroupName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-tenants')]"
+  },
+  "resources": [
+    {
+      "name": "[variables('sqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "apiVersion": "2014-04-01-preview",
+      "tags": {
+        "displayName": "SaaS SQL Server"
+      },
+      "properties": {
+        "administratorLogin": "[variables('sqlServerAdministratorLogin')]",
+        "administratorLoginPassword": "[variables('sqlServeradministratorLoginPassword')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "AllowLocalIps",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "255.255.255.255"
+          }
+        },
+        {
+          "name": "[concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName'))]",
+          "type": "Microsoft.Sql/servers/databases",
+          "location": "eastus",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', variables('sqlserverName'))]"
+          ],
+          "tags": {
+            "displayName": "SaaS Catalog Database"
+          },
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "edition": "Basic",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "Basic"
+          },
+          "resources": [
+            {
+              "name": "Import",
+              "type": "extensions",
+              "apiVersion": "2014-04-01-preview",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', split(concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName')), '/')[0], split(concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName')), '/')[1])]"
+              ],
+              "properties": {
+                "storageKeyType": "StorageAccessKey",
+                "storageKey": "o3hcmckNlLx+p4psxXKTjx8h/p+zIKADRQt+qyAoWYbz/Mop6N/E5VonqtVJHJNDLPMgFbEJckQ6q6ZrSFukdg==",
+                "storageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/bacpacs/saas-catalog-sql.bacpac",
+                "administratorLogin": "[variables('sqlServerAdministratorLogin')]",
+                "administratorLoginPassword": "[variables('sqlServeradministratorLoginPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "[variables('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "F1"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "SaaS Provider App Service Plan"
+      },
+      "properties": {
+        "name": "[variables('appServicePlanName')]",
+        "numberOfWorkers": 1
+      },
+      "resources": [
+        {
+          "name": "[variables('providerWebAppName')]",
+          "type": "Microsoft.Web/sites",
+          "location": "eastus",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]"
+          ],
+          "tags": {
+            "displayName": "SaaS Provider Web App"
+          },
+          "properties": {
+            "name": "[variables('providerWebAppName')]",
+            "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', variables('appServicePlanName'))]"
+          },
+          "resources": [
+            {
+              "name": "appsettings",
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [
+                "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]",
+                "[concat('Microsoft.Web/sites/', variables('providerWebAppName'))]",
+                "[concat('Microsoft.Web/Sites/', variables('providerWebAppName'), '/Extensions/MSDeploy')]"
+              ],
+              "tags": {
+                "displayName": "App Settings"
+              },
+              "properties": {
+                "SaaSOrchestrationApiBaseUri": "[concat('https://', variables('providerOrchestrationApiAppName'), '.azurewebsites.net')]"
+              }
+            },
+            {
+              "name": "MSDeploy",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [ "[resourceId('Microsoft.Web/sites', variables('providerWebAppName'))]" ],
+              "tags": { "displayName": "Deploy" },
+              "properties": {
+                "packageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/packages/Saas.Presentation.Provider.Web.zip"
+              }
+            }
+          ]
+        },
+        {
+          "name": "[variables('providerOrchestrationApiAppName')]",
+          "type": "Microsoft.Web/sites",
+          "kind": "api",
+          "location": "eastus",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]"
+          ],
+          "tags": {
+            "displayName": "SaaS Provider Orchestration API App"
+          },
+          "properties": {
+            "name": "[variables('providerOrchestrationApiAppName')]",
+            "siteConfig": {
+              "connectionStrings": [
+                {
+                  "name": "DefaultConnection",
+                  "connectionString": "[concat('Data Source=tcp:',variables('sqlserverName'),'.database.windows.net;Initial Catalog=',variables('sqlServerDatabaseName'),';User Id=',variables('sqlServerAdministratorLogin'),';Password=',variables('sqlServeradministratorLoginPassword'),';')]",
+                  "type": "SQLAzure"
+                }
+              ]
+            },
+            "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverFarms', variables('appServicePlanName'))]"
+          },
+          "resources": [
+            {
+              "name": "appsettings",
+              "type": "config",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [
+                "[concat('Microsoft.Web/serverFarms/', variables('appServicePlanName'))]",
+                "[concat('Microsoft.Web/sites/', variables('providerOrchestrationApiAppName'))]",
+                "[concat('Microsoft.Web/Sites/', variables('providerOrchestrationApiAppName'), '/Extensions/MSDeploy')]"
+              ],
+              "tags": {
+                "displayName": "App Settings"
+              },
+              "properties": {
+                "SaasFoundationResourceGroupName": "[resourceGroup().name]",
+                "SaasTenantResourceGroupName": "[variables('tenantResourceGroupName')]",
+                "SaasProviderName": "[parameters('SaasProvider')]",
+                "SaasEnvironmentName": "[parameters('Environment')]"
+              }
+            },
+            {
+              "name": "MSDeploy",
+              "type": "extensions",
+              "location": "[resourceGroup().location]",
+              "apiVersion": "2015-08-01",
+              "dependsOn": [ "[resourceId('Microsoft.Web/sites', variables('providerOrchestrationApiAppName'))]" ],
+              "tags": { "displayName": "Deploy" },
+              "properties": {
+                "packageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/packages/Saas.Logic.Orchestration.Api.zip"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "outputs": {
+  }
+}

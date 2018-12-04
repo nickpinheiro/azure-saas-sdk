@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "SaasProvider": {
+      "type": "string"
+    },
+    "Environment": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat(parameters('SaasProvider'), parameters('Environment'), 'saas')]",
+    "sqlServerDatabaseName": "[concat(parameters('SaasProvider'), '-', parameters('Environment'), '-catalog')]"
+  },
+  "resources": [
+    {
+      "name": "[concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName'))]",
+      "type": "Microsoft.Sql/servers/databases",
+      "location": "eastus",
+      "apiVersion": "2014-04-01-preview",
+      "tags": {
+        "displayName": "Database"
+      },
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "edition": "Basic",
+        "maxSizeBytes": "1073741824",
+        "requestedServiceObjectiveName": "Basic"
+      },
+      "resources": [
+        {
+          "name": "Import",
+          "type": "extensions",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/databases', split(concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName')), '/')[0], split(concat(variables('sqlServerName'), '/', variables('sqlServerDatabaseName')), '/')[1])]"
+          ],
+          "properties": {
+            "storageKeyType": "StorageAccessKey",
+            "storageKey": "h5fXgAi8Y0gn0/m+nwv7S6b1KUfwaEm12luuOULizhm4CjgOggLSI8xnbHZUvMhqzONJaZKnqK7nAMJ9JpqZCg==",
+            "storageUri": "https://mastorageacct.blob.core.windows.net/ma-product-releases/subscriber/database/Resources/ma-subs-release-v1.bacpac",
+            "administratorLogin": "saasadmin",
+            "administratorLoginPassword": "pass@word1",
+            "operationMode": "Import"
+          }
+        }
+      ]
+    }      
+  ],
+  "outputs": {
+  }
+}

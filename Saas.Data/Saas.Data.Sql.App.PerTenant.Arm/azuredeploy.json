@@ -43,8 +43,8 @@
           "properties": {
             "storageKeyType": "SharedAccessKey",
             "storageKey": "?",
-            "storageUri": "https://contosodevstorageacct.blob.core.windows.net/bacpacs/wingtiptenantdb.bacpac",
-            "administratorLogin": "contosoadmin",
+            "storageUri": "https://contosodevartifacts.blob.core.windows.net/artifacts/bacpacs/wingtiptenantdb.bacpac",
+            "administratorLogin": "saasadmin",
             "administratorLoginPassword": "pass@word1",
             "operationMode": "Import"
           }
