@@ -8,7 +8,7 @@ Download the companion slide deck from the 2018 Microsoft Azure + AI Conference:
 https://downloader.modernappz.com/nickpinheiro/modernize-your-app-to-be-delivered-as-a-saas-service
 
 ## Wingtip Tickets SaaS - Standalone Application (aka App-per-tenant)
-The Azure SaaS Development Kit builds on the Wingtip Tickets SaaS demo solution (Standalone Application (aka App-per-tenant)).  Additional tools and features include a SaaS Provider Web Application with pricing plans, automated tenant deployments via API App and centralized logging with CosmosDB.
+The Azure SaaS Development Kit builds on the Wingtip Tickets SaaS demo solution (Standalone Application (aka App-per-tenant)).  Additional tools and features include a SaaS Provider Web Application with pricing plans and automated tenant deployments via API App.
 https://github.com/Microsoft/WingtipTicketsSaaS-StandaloneApp
 
 ## Subscribe for Updates
