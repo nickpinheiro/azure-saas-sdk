@@ -11,7 +11,7 @@ The Azure SaaS Development Kit provides tools to help developers deliver their a
 
 ## Setup and Configuration
 1. Run the 'Deploy to Azure' button above
-2. Once the deployment is complete, create a 'App Registration' for the Orchestration API App in Azure Active Directory
+2. Once the deployment is complete, create an 'App Registration' for the Orchestration API App in Azure Active Directory
 3. Provide the App Registration created in Step 2 with 'Contributer' level Access control (IAM) permissions to your Azure Subscription 
 4. Add the following 'Application Settings' values relative to your Subscription in the Orchestration API App app service ([SaaS Provider]-[Environment]-provider-api)
 - ida:Subscription
@@ -19,6 +19,7 @@ The Azure SaaS Development Kit provides tools to help developers deliver their a
 - ida:TenantId
 - ida:ClientId
 - ida:AppKey
+5. Load the SaaS Provider web app, select a Plan, provide a Tenant 'Name' and submit.  Your first tenant will be created in the '[SaaS Provider]-[Environment]-Tenants' Resource Group.
 
 ## Downloads
 Download the companion slide deck from the 2018 Microsoft Azure + AI Conference:
